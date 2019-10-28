@@ -1,5 +1,5 @@
 '''
-采用ngram分词提取特征，范围为（1,3）
+采用ngram分词或TFIDF提取特征，范围为（1,3）
 StratifiedKFold 5折交叉验证
 xgboost进行分类
 '''
@@ -22,11 +22,16 @@ with open("security_train.csv.pkl", "rb") as f:
     labels = pickle.load(f)
     files = pickle.load(f)  
 
-# api 序列转换为向量表示
+# 词袋模型 ngram 提取特征
 vectorizer = CountVectorizer(ngram_range=(1, 3))
 x_train = vectorizer.fit_transform(files)  
 x_test = vectorizer.transform(outfiles)  
 y_train = labels
+
+# # Tfidf 提取特征
+# vectorizer = TfidfVectorizer(ngram_range=(1,3), min_df=3, max_df=0.9, )  
+# train_features = vectorizer.fit_transform(files)  # (144, 19882)
+# out_features = vectorizer.transform(outfiles)  # (172, 19882)
 
 # print(y_train)
 

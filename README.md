@@ -7,7 +7,7 @@ Renjie Pu's code
 
 ### train.py
 
-用 ngram 提取 api 序列特征，采用五折交叉验证用 xgboost 进行分类
+用 ngram 或 TFIDF 提取 api 序列特征，采用五折交叉验证用 xgboost 进行分类
 
 ### 提交结果
 
