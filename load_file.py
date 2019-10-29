@@ -10,9 +10,11 @@ import pandas as pd
 import pickle
 import numpy as np
 
-train_path = r'security_train.csv'
-test_path = r'security_test.csv'
+# train_path = r'security_train.csv'
+# test_path = r'security_test.csv'
 
+train_path = '../test/test_train.csv'
+test_path = '../test/test_test.csv'
 
 def read_train_file(path):
     labels = []

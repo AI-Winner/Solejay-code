@@ -5,6 +5,7 @@ xgboost进行分类
 '''
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC
 from sklearn.model_selection import StratifiedKFold
 import xgboost as xgb
 import pickle
@@ -13,12 +14,12 @@ import time
 import csv
 
 # test 文件
-with open("security_test.csv.pkl", "rb") as f:
+with open("../test/security_test.csv.pkl", "rb") as f:
     file_names = pickle.load(f)
     outfiles = pickle.load(f)  
 
 # train 文件
-with open("security_train.csv.pkl", "rb") as f:
+with open("../test/security_train.csv.pkl", "rb") as f:
     labels = pickle.load(f)
     files = pickle.load(f)  
 
@@ -35,9 +36,9 @@ y_train = labels
 
 # print(y_train)
 
+# xgboost 模型
 meta_train = np.zeros(shape=(len(files), 8))  
 meta_test = np.zeros(shape=(len(outfiles), 8))  
-
 # StratifiedKFold用法类似 Kfold，但是他是分层采样，确保训练集，测试集中各类别样本的比例与原始数据集中相同
 skf = StratifiedKFold(n_splits=5, random_state=4, shuffle=True)
 for i, (tr_ind, te_ind) in enumerate(skf.split(x_train, labels)):
@@ -45,10 +46,12 @@ for i, (tr_ind, te_ind) in enumerate(skf.split(x_train, labels)):
     X_val, X_val_label = x_train[te_ind], labels[te_ind]
 
     print('FOLD: {}'.format(str(i)))
-    print(len(te_ind), len(tr_ind))
+    print(len(te_ind), len(tr_ind)) # 测试集和训练集数量
+
     dtrain = xgb.DMatrix(X_train, label=X_train_label)
     dtest = xgb.DMatrix(X_val, X_val_label)
     dout = xgb.DMatrix(x_test)
+
     param = {'max_depth': 6, 'eta': 0.1, 'eval_metric': 'mlogloss', 'silent': 1, 'objective': 'multi:softprob',
              'num_class': 8, 'subsample': 0.8,
              'colsample_bytree': 0.85}  # 参数
@@ -64,7 +67,12 @@ for i, (tr_ind, te_ind) in enumerate(skf.split(x_train, labels)):
     meta_test += pred_test
 meta_test /= 5.0
 result = meta_test
-# print(result)
+
+# SVM 模型
+svc = SVC(gamma='auto', probability=True, decision_function_shape='ovo')
+svc.fit(x_train, y_train)
+result = svc.predict_proba(x_test)
+
 out = []
 for i in range(len(file_names)):
     tmp = []
@@ -75,10 +83,7 @@ for i in range(len(file_names)):
     tmp.append(file_names[i])
     tmp.extend(a)
     out.append(tmp)
-with open("ngram_3gram_{}.csv".format(
-        str(time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime()))),
-        "w",
-        newline='') as csvfile:
+with open("../test/ngram_3gram.csv", "w", newline='') as csvfile:
     writer = csv.writer(csvfile)
 
     # 先写入columns_name

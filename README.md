@@ -7,7 +7,60 @@ Renjie Pu's code
 
 ### train.py
 
-用 ngram 或 TFIDF 提取 api 序列特征，采用五折交叉验证用 xgboost 进行分类
+##### 特征提取
+
+- ngram 
+- TFIDF
+
+##### 模型选择
+
+- xgboost 模型
+- svm 模型
+
+##### 模型优化
+
+xgboost 进行 5 折交叉验证选取效果最好的模型
+
+```python
+meta_train = np.zeros(shape=(len(files), 8))  
+meta_test = np.zeros(shape=(len(outfiles), 8))  
+# StratifiedKFold用法类似 Kfold，但是他是分层采样，确保训练集，测试集中各类别样本的比例与原始数据集中相同
+skf = StratifiedKFold(n_splits=5, random_state=4, shuffle=True)
+for i, (tr_ind, te_ind) in enumerate(skf.split(x_train, labels)):
+    X_train, X_train_label = x_train[tr_ind], labels[tr_ind]
+    X_val, X_val_label = x_train[te_ind], labels[te_ind]
+
+    print('FOLD: {}'.format(str(i)))
+    print(len(te_ind), len(tr_ind)) # 测试集和训练集数量
+
+    dtrain = xgb.DMatrix(X_train, label=X_train_label)
+    dtest = xgb.DMatrix(X_val, X_val_label)
+    dout = xgb.DMatrix(x_test)
+
+    param = {'max_depth': 6, 'eta': 0.1, 'eval_metric': 'mlogloss', 'silent': 1, 'objective': 'multi:softprob',
+             'num_class': 8, 'subsample': 0.8,
+             'colsample_bytree': 0.85}  # 参数
+
+    evallist = [(dtrain, 'train'), (dtest, 'val')]  # 测试 , (dtrain, 'train')
+    num_round = 300  # 循环次数
+    bst = xgb.train(param, dtrain, num_round, evallist, early_stopping_rounds=50)
+
+    # dtr = xgb.DMatrix(train_features)
+    pred_val = bst.predict(dtest)
+    pred_test = bst.predict(dout)
+    meta_train[te_ind] = pred_val
+    meta_test += pred_test
+meta_test /= 5.0
+result = meta_test
+```
+
+svm 模型
+
+```python
+svc = SVC(gamma='auto', probability=True, decision_function_shape='ovo')
+svc.fit(x_train, y_train)
+result = svc.predict_proba(x_test)
+```
 
 ### 提交结果
 
