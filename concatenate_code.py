@@ -1,7 +1,10 @@
 '''
+特征提取和模型使用整合到同一个文件中，各自完整代码参照其他文件
 采用ngram分词或TFIDF提取特征，范围为（1,3）
 StratifiedKFold 5折交叉验证
 xgboost进行分类
+
+svm进行分类
 '''
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.linear_model import LogisticRegression
@@ -25,16 +28,17 @@ with open("../test/security_train.csv.pkl", "rb") as f:
 
 # 词袋模型 ngram 提取特征
 vectorizer = CountVectorizer(ngram_range=(1, 3))
-x_train = vectorizer.fit_transform(files)  
-x_test = vectorizer.transform(outfiles)  
-y_train = labels
+x_train = vectorizer.fit_transform(files)  # (13887, 180858) 
+y_train = labels # (13887,)
+x_test = vectorizer.transform(outfiles)  # (12955, 180858)
 
 # # Tfidf 提取特征
 # vectorizer = TfidfVectorizer(ngram_range=(1,3), min_df=3, max_df=0.9, )  
-# train_features = vectorizer.fit_transform(files)  # (144, 19882)
-# out_features = vectorizer.transform(outfiles)  # (172, 19882)
+# train_features = vectorizer.fit_transform(files)  # (13887, 180858) 
+# y_train = labels # (13887,)
+# out_features = vectorizer.transform(outfiles)  # (12955, 180858)
 
-# print(y_train)
+
 
 # xgboost 模型
 meta_train = np.zeros(shape=(len(files), 8))  
