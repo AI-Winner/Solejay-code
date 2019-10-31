@@ -64,13 +64,27 @@ result = svc.predict_proba(x_test)
 
 ### 提交结果
 
-- 词袋模型+xgboost 5折交叉验证
+- 词袋模型+xgboost 5折交叉验证（未填写的参数为默认参数）
 
 unigram：0.567571（ngram_range=(1, 1)）
 
 3_gram：0.473048（ngram_range=(1, 3)）
 
+4_gram：0.473261（ngram_range=(1, 4)）
+
 5_gram：0.473122（ngram_range=(1, 5)）
+
+(1,3)_gram：0.476422（ngram_range=(1, 3), min_df=3, max_df=0.9）
+
+> train-mlogloss:0.070641 val-mlogloss:0.2973
+
+(2, 3)_gram：0.484424（ngram_range=(2, 3)）
+
+>  train-mlogloss:0.074861 val-mlogloss:0.297651
+
+(2, 4)_gram：0.482929（ngram_range=(2, 4)）
+
+> train-mlogloss:0.077568 val-mlogloss:0.294211
 
 - TFIDF模型+xgboost 5折交叉验证
 
@@ -80,3 +94,9 @@ unigram：0.659438（ngram_range=(1, 1)）
 
 5_gram：0.507149（ngram_range=(1, 5)）
 
+### 结果总结
+
+1. ngram 模型效果优于 IFIDF 模型
+2. ngram_range（1, 3）效果优于（1, 1）和（1, 5）
+3. ngram_range 从 1 开始 优于 从 2 开始
+4. min_df 和 max_df 参数修改后效果变差
