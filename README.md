@@ -5,7 +5,9 @@ Renjie Pu's code
 
 读取训练集和测试集数据，处理后保存每个文件对应的 `label` 和 `拼接的 api 序列` 并保存为 `pkl` 文件实现数据的持久存储。
 
-### train.py
+### concatenate_code.py
+
+整合两种词向量模型和分类器代码
 
 ##### 特征提取
 
@@ -62,37 +64,67 @@ svc.fit(x_train, y_train)
 result = svc.predict_proba(x_test)
 ```
 
+### xgboost.py
+
+ngram + xgboost 分类器代码
+
+### svm.py
+
+ngram + svm 分类器代码
+
+### mean.py
+
+四个不同随机种子对模型进行训练的结果文件取平均
+
 ### 提交结果
 
 - 词袋模型+xgboost 5折交叉验证（未填写的参数为默认参数）
 
-unigram：0.567571（ngram_range=(1, 1)）
+unigram：**0.567571**（ngram_range=(1, 1)）
 
-3_gram：0.473048（ngram_range=(1, 3)）
+3_gram：**0.473048**（ngram_range=(1, 3)）
 
-4_gram：0.473261（ngram_range=(1, 4)）
+4_gram：**0.473261**（ngram_range=(1, 4)）
 
-5_gram：0.473122（ngram_range=(1, 5)）
+5_gram：**0.473122**（ngram_range=(1, 5)）
 
-(1,3)_gram：0.476422（ngram_range=(1, 3), min_df=3, max_df=0.9）
+(1,3)_gram：**0.476422**（ngram_range=(1, 3), min_df=3, max_df=0.9）
 
 > train-mlogloss:0.070641 val-mlogloss:0.2973
 
-(2, 3)_gram：0.484424（ngram_range=(2, 3)）
+(2, 3)_gram：**0.484424**（ngram_range=(2, 3)）
 
 >  train-mlogloss:0.074861 val-mlogloss:0.297651
 
-(2, 4)_gram：0.482929（ngram_range=(2, 4)）
+(2, 4)_gram：**0.482929**（ngram_range=(2, 4)）
 
 > train-mlogloss:0.077568 val-mlogloss:0.294211
 
 - TFIDF模型+xgboost 5折交叉验证
 
-unigram：0.659438（ngram_range=(1, 1)）
+unigram：**0.659438**（ngram_range=(1, 1)）
 
-3_gram：0.505826（ngram_range=(1, 3)）
+3_gram：**0.505826**（ngram_range=(1, 3)）
 
-5_gram：0.507149（ngram_range=(1, 5)）
+5_gram：**0.507149**（ngram_range=(1, 5)）
+
+- ngram(ngram_range(1, 3)) + xgboost 5折交叉验证 + 随机种子
+
+random_state=4：**0.473048**
+
+> train-mlogloss:0.06956 val-mlogloss:0.298036
+
+random_state=42：**0.472576**
+
+> train-mlogloss:0.07944 val-mlogloss:0.297976
+
+random_state=8：**0.474908**
+
+> train-mlogloss:0.072324 val-mlogloss:0.313219
+
+random_state=0：**0.473606**
+
+> train-mlogloss:0.061369 val-mlogloss:0.285387
 
 ### 结果总结
 
