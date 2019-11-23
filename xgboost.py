@@ -42,7 +42,8 @@ with open("ngram_model/ngram(1,3)_vec.pkl", 'rb') as f:
 ngram_train = np.zeros(shape=(13887, 8))  # 训练集（验证集）预测结果
 ngram_test = np.zeros(shape=(12955, 8)) # 测试集预测结果
 
-skf = StratifiedKFold(n_splits=5, random_state=42, shuffle=True)
+k = 10 # 交叉验证的折数
+skf = StratifiedKFold(n_splits=k, random_state=42, shuffle=True)
 for i, (tr_ind, te_ind) in enumerate(skf.split(x_train, y_train)):
     X_train, X_train_label = x_train[tr_ind], y_train[tr_ind]
     X_val, X_val_label = x_train[te_ind], y_train[te_ind]
@@ -59,7 +60,7 @@ for i, (tr_ind, te_ind) in enumerate(skf.split(x_train, y_train)):
              'colsample_bytree': 0.85}  # 参数
 
     evallist = [(dtrain, 'train'), (dtest, 'val')]  # 测试 , (dtrain, 'train')
-    num_round = 50  # 循环次数
+    num_round = 300  # 循环次数
     bst = xgb.train(param, dtrain, num_round, evallist, early_stopping_rounds=50)
 
     # dtr = xgb.DMatrix(train_features)
@@ -67,10 +68,17 @@ for i, (tr_ind, te_ind) in enumerate(skf.split(x_train, y_train)):
     pred_test = bst.predict(dout)
     ngram_train[te_ind] = pred_val
     ngram_test += pred_test
-ngram_test /= 5.0
-result = ngram_test
+ngram_test /= k * 1.0
 
+# 保存训练集和测试集预测结果
+with open("ngram_model/ngram_result_seed42.pkl", 'wb') as f:
+    pickle.dump(ngram_train, f)
+    pickle.dump(ngram_test, f)
+
+# 输出 csv 文件
+result = ngram_test
 out = []
+
 for i in range(len(test_nums)):
     tmp = []
     a = result[i].tolist()
@@ -78,7 +86,8 @@ for i in range(len(test_nums)):
     tmp.append(test_nums[i])
     tmp.extend(a)
     out.append(tmp)
-with open("xgboost(1,3)测试123.csv", "w", newline='') as csvfile:
+    
+with open("result/xgboost(1,3)_10折_seed42.csv", "w", newline='') as csvfile:
     writer = csv.writer(csvfile)
 
     # 先写入columns_name
