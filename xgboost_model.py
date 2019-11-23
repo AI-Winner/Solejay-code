@@ -9,12 +9,12 @@ import time
 import csv
 
 # test 文件
-with open("security_test.csv.pkl", "rb") as f:
+with open("/media/solejay/文档/purenjie/研究生/竞赛/aliyun/test/security_test.csv.pkl", "rb") as f:
     file_names = pickle.load(f)
     outfiles = pickle.load(f)  
 
 # train 文件
-with open("security_train.csv.pkl", "rb") as f:
+with open("/media/solejay/文档/purenjie/研究生/竞赛/aliyun/test/security_train.csv.pkl", "rb") as f:
     labels = pickle.load(f)
     files = pickle.load(f)  
 
@@ -40,8 +40,8 @@ for i, (tr_ind, te_ind) in enumerate(skf.split(x_train, labels)):
     dtest = xgb.DMatrix(X_val, X_val_label)
     dout = xgb.DMatrix(x_test)
 
-    param = {'max_depth': 6, 'eta': 0.1, 'eval_metric': 'mlogloss', 'silent': 1, 'objective': 'multi:softprob',
-             'num_class': 8, 'subsample': 0.8,
+    param = {'max_depth': 6, 'eta': 0.1, 'eval_metric': 'mlogloss', 'silent': 1, 'objective': 'multi:softmax',
+             'num_class': 8, 'subsample': 1,
              'colsample_bytree': 0.85}  # 参数
 
     evallist = [(dtrain, 'train'), (dtest, 'val')]  # 测试 , (dtrain, 'train')
@@ -50,27 +50,29 @@ for i, (tr_ind, te_ind) in enumerate(skf.split(x_train, labels)):
 
     # dtr = xgb.DMatrix(train_features)
     pred_val = bst.predict(dtest)
+    print("pred_val:", pred_val)
     pred_test = bst.predict(dout)
+    print("pred_test:", pred_test)
     meta_train[te_ind] = pred_val
     meta_test += pred_test
-meta_test /= 5.0
-result = meta_test
-
-out = []
-for i in range(len(file_names)):
-    tmp = []
-    a = result[i].tolist()
-    # for j in range(len(a)):
-    #     a[j] = ("%.5f" % a[j])
-
-    tmp.append(file_names[i])
-    tmp.extend(a)
-    out.append(tmp)
-with open("xgboost.csv", "w", newline='') as csvfile:
-    writer = csv.writer(csvfile)
-
-    # 先写入columns_name
-    writer.writerow(["file_id", "prob0", "prob1", "prob2", "prob3", "prob4", "prob5", "prob6", "prob7"
-                     ])
-    # 写入多行用writerows
-    writer.writerows(out)
+# meta_test /= 5.0
+# result = meta_test
+#
+# out = []
+# for i in range(len(file_names)):
+#     tmp = []
+#     a = result[i].tolist()
+#     # for j in range(len(a)):
+#     #     a[j] = ("%.5f" % a[j])
+#
+#     tmp.append(file_names[i])
+#     tmp.extend(a)
+#     out.append(tmp)
+# with open("xgboost.csv", "w", newline='') as csvfile:
+#     writer = csv.writer(csvfile)
+#
+#     # 先写入columns_name
+#     writer.writerow(["file_id", "prob0", "prob1", "prob2", "prob3", "prob4", "prob5", "prob6", "prob7"
+#                      ])
+#     # 写入多行用writerows
+#     writer.writerows(out)

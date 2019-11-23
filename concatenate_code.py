@@ -10,7 +10,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 from sklearn.model_selection import StratifiedKFold
-import xgboost as xgb
+import xgboost_model as xgb
 import pickle
 import numpy as np
 import time

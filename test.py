@@ -3,7 +3,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 from sklearn.model_selection import StratifiedKFold
 from sklearn.model_selection import train_test_split
-import xgboost as xgb
+import xgboost_model as xgb
 import pickle
 import numpy as np
 import time

@@ -1,10 +1,10 @@
 import pandas as pd
 import csv
 
-src1 = 'result/xgboost(1,3)_seed0_subsample1.csv'
-src2 = 'result/xgboost(1,3)_seed4_subsample1.csv'
-src3 = 'result/xgboost(1,3)_seed8_subsample1.csv'
-src4 = 'result/xgboost(1,3)_subsample1_seed42.csv'
+src1 = 'result/xgboost(1,3)_10折_seed0_subsample1.csv'
+src2 = 'result/xgboost(1,3)_10折_seed4_subsample1.csv'
+src3 = 'result/xgboost(1,3)_10折_seed8_subsample1.csv'
+src4 = 'result/xgboost(1,3)_10折_seed42_subsample1.csv'
 out = []
 
 res1 = pd.read_csv(src1)
@@ -24,7 +24,7 @@ for i in range(res.shape[0]):
     out.append(tmp)
 
 # 输出csv文档
-with open("result/4_mean_seed_subsample1.csv", "w", newline='') as csvfile:
+with open("result/4_mean_seed_10折_subsample1.csv", "w", newline='') as csvfile:
     writer = csv.writer(csvfile)
 
     # 先写入columns_name
