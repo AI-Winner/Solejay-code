@@ -10,8 +10,8 @@ import pandas as pd
 import pickle
 import numpy as np
 
-train_path = r'security_train.csv'
-test_path = r'security_test.csv'
+train_path = r'../train_label_four.csv'
+# test_path = r'security_test.csv'
 
 
 def read_train_file(path):
@@ -27,7 +27,7 @@ def read_train_file(path):
         labels.append(file_labels)
         train_apis.append(api_sequence)
     labels = np.asarray(labels)  # 转换为 numpy 数组
-    with open("security_train.csv.pkl", 'wb') as f:
+    with open("train_label_four.csv.pkl", 'wb') as f:
         pickle.dump(labels, f)
         pickle.dump(train_apis, f)
 
@@ -50,5 +50,5 @@ def read_test_file(path):
 print("read train file.....")
 read_train_file(train_path)
 print("read test file......")
-read_test_file(test_path)
+# read_test_file(test_path)
 

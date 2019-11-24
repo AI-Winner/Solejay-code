@@ -23,7 +23,6 @@ y_true = y_true.astype(int)  # string 转换为 int 类型
 y_pred = ngram_train.argmax(axis=1)
 
 
-
 tick_marks = np.array(range(len(labels))) + 0.5
 
 
@@ -42,7 +41,7 @@ cm = confusion_matrix(y_true, y_pred)
 np.set_printoptions(precision=2)
 cm_normalized = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
 print(cm_normalized)
-plt.figure(figsize=(12, 8), dpi=120)
+plt.figure(figsize=(12, 8), dpi=200)
 
 ind_array = np.arange(len(labels))
 x, y = np.meshgrid(ind_array, ind_array)
@@ -61,7 +60,7 @@ plt.gcf().subplots_adjust(bottom=0.15)
 
 plot_confusion_matrix(cm_normalized, title='Normalized confusion matrix')
 # show confusion matrix
-plt.savefig('confusion_matrix.png', format='png')
+plt.savefig('train_confuse_matrix.png', format='png')
 plt.show()
 
 

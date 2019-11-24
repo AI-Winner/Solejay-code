@@ -1,44 +1,49 @@
-# 混淆矩阵代码
-true_train = []
-pred_train = []
-meta_test = np.zeros(shape=(len(outfiles), 8))  
-# StratifiedKFold用法类似 Kfold，但是他是分层采样，确保训练集，测试集中各类别样本的比例与原始数据集中相同
-skf = StratifiedKFold(n_splits=5, random_state=0, shuffle=True)
-for i, (tr_ind, te_ind) in enumerate(skf.split(x_train, labels)):
-    X_train, X_train_label = x_train[tr_ind], labels[tr_ind]
-    X_val, X_val_label = x_train[te_ind], labels[te_ind]
+import pickle
+import numpy as np
+import pandas as pd
 
-    
-    meta_train = np.zeros(shape=(len(tr_ind), 8))
-    meta_val = np.zeros(shape=(len(te_ind), 8))
+#
+# # 类别 4 数据
+# with open("train_label_four.csv.pkl", "rb") as f:
+#     labels_4 = pickle.load(f) # ndarray (53,)
+#     train_apis_4 = pickle.load(f)  # list 53
+#
+# # 训练集全体
+# with open("../security_train.csv.pkl", "rb") as f:
+#     labels = pickle.load(f) # ndarray (13887,)
+#     train_apis = pickle.load(f)  # list 13887
+#
+# labels_concate = np.append(labels, labels_4)
+# train_apis_concate = np.append(train_apis, train_apis_4)
 
-    print('FOLD: {}'.format(str(i)))
-    print(len(te_ind), len(tr_ind)) # 测试集和验证集数量
+# 加入第 4 类数据测试
+# label1 = np.array([1, 2, 3, 4, 5])
+# label2 = np.array([6, 7, 8, 9, 10])
+# labels = np.concatenate((label1, label2), axis=0)
+#
+# api1 = [['api1', 'api2', 'api3'], ['api4', 'api5', 'api6']]
+# api2 = [['api7', 'api8', 'api9'], ['api10', 'api11', 'api12']]
+# # apis = np.concatenate((api1, api2), axis=0)
+# apis = np.vstack((api1, api2))
 
-    dtrain = xgb.DMatrix(X_train, label=X_train_label)
-    dtest = xgb.DMatrix(X_val, X_val_label)
-    dout = xgb.DMatrix(x_test)
+# word2vec 数据预处理
+with open("train_label_four.csv.pkl", "rb") as f:
+    labels_4 = pickle.load(f) # ndarray (53,)
+    train_apis_4 = pickle.load(f)  # list 53
 
-    param = {'max_depth': 6, 'eta': 0.1, 'eval_metric': 'mlogloss', 'silent': 1, 'objective': 'multi:softprob',
-             'num_class': 8, 'subsample': 1,
-             'colsample_bytree': 0.85}  # 参数
 
-    evallist = [(dtrain, 'train'), (dtest, 'val')]  # 测试 , (dtrain, 'train')
-    num_round = 10  # 循环次数
-    bst = xgb.train(param, dtrain, num_round, evallist, early_stopping_rounds=50)
+with open('word2vec_test.txt', 'w') as f:
+    for sentence in train_apis_4:
+        f.write(sentence)
+        f.write('\n')
 
-    # dtr = xgb.DMatrix(train_features)
-    pred_val = bst.predict(dtest)
 
-    # 验证集真实值和预测值
-    true_val = X_val_label
-    pred_val = pred_val.argmax(axis=1)
+from gensim.models import Word2Vec
+word2vec = Word2Vec(corpus_file='word2vec_test.txt')
+word2vec.save('word2vec.model')
+model = Word2Vec.load('word2vec.model')
+vec = model.wv['NtQueryKey']
+print(vec)
 
-    true_train = np.append(true_train, true_val) # 验证集真实标签求和
-    print(true_train.shape)
-    pred_train = np.append(pred_train, pred_val) # 验证集预测标签求和
-    print(pred_train.shape)
 
-    print(confusion_matrix(pred_val, true_val))
 
-print(confusion_matrix(pred_train, true_train))
